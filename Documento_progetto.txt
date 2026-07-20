@@ -1,0 +1,20 @@
+DOCUMENTO DI PROGETTO - FASE 1 (Architettura Iniziale)
+Obiettivo: Risolvere l'equazione del calore 2D e confrontare i tempi di esecuzione usando l'ordinamento naturale e il riordinamento di tipo "nested dissection" tramite fattorizzazione di Cholesky.
+
+Architettura del Software:
+Il progetto sarà diviso in due moduli principali:
+1. Modulo C++ (Generazione Dati e Matrici)
+2. Modulo Python (Risoluzione e Analisi Sperimentale)
+
+Modulo 1: Sotto-moduli C++ previsti
+- Generazione della griglia del dominio (Task 1).
+- Costruzione del grafo di adiacenza (Task 1).
+- Partizionamento e riordinamento dei nodi (nested dissection) (Task 2).
+- Costruzione della matrice sparsa e del termine noto (Task 3).
+- Esportazione dei dati su file di testo (.txt).
+
+Modulo 2: Sotto-moduli Python previsti
+- Lettura dei file esportati dal C++ e creazione della matrice sparsa in formato CSC (Task 4).
+- Risoluzione del sistema lineare con fattorizzazione di Cholesky (Task 4).
+- Analisi sperimentale: calcolo dei tempi, numero di elementi non-zero per N = 32, 64, ..., 1024 (Task 5).
+- Plotting della soluzione e della struttura della matrice (Task 5).
