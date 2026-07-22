@@ -18,3 +18,21 @@ Modulo 2: Sotto-moduli Python previsti
 - Risoluzione del sistema lineare con fattorizzazione di Cholesky (Task 4).
 - Analisi sperimentale: calcolo dei tempi, numero di elementi non-zero per N = 32, 64, ..., 1024 (Task 5).
 - Plotting della soluzione e della struttura della matrice (Task 5).
+
+
+
+--- AGGIORNAMENTO FASE 2: Specifica Task 1 (Grafo di Adiacenza) ---
+Obiettivo: Implementare il Task 1 in C++ per la generazione della griglia e del grafo.
+
+- Input: Un intero N (letto da tastiera) che definisce la discretizzazione del dominio.
+- Output: 
+  1. File "coords.txt": conterrà per ogni nodo interno un indice n, gli indici i, j e le coordinate x, y.
+  2. File "connectivity.txt": conterrà l'elenco degli archi (e, n1, n2) per i nodi adiacenti (orizzontalmente e verticalmente).
+
+- Funzionalità richieste:
+  - Calcolo del passo h = 1 / (N+1).
+  - Ciclo sui nodi interni (i e j che vanno da 1 a N).
+  - Assegnazione di un indice n = (j-1)*N + (i-1) ad ogni nodo.
+  - Creazione degli archi evitando duplicati (collegando ogni nodo solo con il vicino a destra e in alto).
+
+- Complessità attesa: Lineare rispetto al numero di nodi (O(N^2)).
