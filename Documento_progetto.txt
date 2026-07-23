@@ -1,4 +1,4 @@
-DOCUMENTO DI PROGETTO - FASE 1 (Architettura Iniziale)
+DOCUMENTO DI PROGETTO -(Architettura Iniziale)
 Obiettivo: Risolvere l'equazione del calore 2D e confrontare i tempi di esecuzione usando l'ordinamento naturale e il riordinamento di tipo "nested dissection" tramite fattorizzazione di Cholesky.
 
 Architettura del Software:
@@ -21,18 +21,73 @@ Modulo 2: Sotto-moduli Python previsti
 
 
 
---- AGGIORNAMENTO FASE 2: Specifica Task 1 (Grafo di Adiacenza) ---
-Obiettivo: Implementare il Task 1 in C++ per la generazione della griglia e del grafo.
+ --- AGGIORNAMENTO FASE 1: Specifica Task 1 (Grafo di Adiacenza) ---
+Obiettivo: Implementare il Task 1 in C++ per la generazione della griglia spaziale e del relativo grafo di adiacenza.
 
-- Input: Un intero N (letto da tastiera) che definisce la discretizzazione del dominio.
+- Input: Un intero N (letto da standard input con validazione N > 0) che definisce la discretizzazione del dominio.
 - Output: 
-  1. File "coords.txt": conterrà per ogni nodo interno un indice n, gli indici i, j e le coordinate x, y.
-  2. File "connectivity.txt": conterrà l'elenco degli archi (e, n1, n2) per i nodi adiacenti (orizzontalmente e verticalmente).
+  1. File "coords.txt": contiene per ogni nodo interno l'indice progressivo n, gli indici di griglia i, j e le coordinate spaziali x, y.
+  2. File "connectivity.txt": contiene l'elenco degli archi (e, n1, n2) per i nodi adiacenti.
 
-- Funzionalità richieste:
-  - Calcolo del passo h = 1 / (N+1).
-  - Ciclo sui nodi interni (i e j che vanno da 1 a N).
-  - Assegnazione di un indice n = (j-1)*N + (i-1) ad ogni nodo.
-  - Creazione degli archi evitando duplicati (collegando ogni nodo solo con il vicino a destra e in alto).
+- Specifiche funzionali:
+  - Calcolo del passo spaziale h = 1.0 / (N+1).
+  - Mappatura della griglia: utilizzo di una funzione dedicata (calcola_n) per mappare gli indici bidimensionali (i, j) in un indice monodimensionale n = (j-1)*N + (i-1), con numerazione a partire da 0.
+  - Generazione coordinate: ciclo iterativo sui nodi interni (i, j da 1 a N) per il calcolo "on-the-fly" delle coordinate x = i*h e y = j*h.
+  - Generazione archi: un secondo ciclo iterativo elabora gli archi. Per garantire un grafo non orientato privo di duplicati, il nodo corrente (n1) viene connesso esclusivamente al nodo alla sua destra (i+1) e al nodo soprastante (j+1), verificando di non eccedere i bordi della griglia (i < N, j < N).
 
-- Complessità attesa: Lineare rispetto al numero di nodi (O(N^2)).
+- Strutture dati utilizzate:
+  - Tipi di dato primitivi (int, double) per il calcolo posizionale.
+  - Il modulo è stato ottimizzato per non utilizzare array o vector in memoria: i dati calcolati vengono convogliati direttamente verso strutture di output stream (std::ofstream) per la scrittura sequenziale su disco.
+
+- Complessità attesa degli algoritmi: 
+  - Complessità temporale: O(N^2). Il codice esegue iterazioni annidate proporzionali al numero totale di nodi interni.
+  - Complessità spaziale: O(1) (memoria ausiliaria). Grazie alla scrittura diretta su file stream, l'occupazione di memoria in esecuzione è costante e non scala al crescere di N.
+
+- Eventuali invarianti mantenuti dalle strutture dati:
+  - Limiti di dominio: le coordinate spaziali (x, y) generate sono strettamente confinate nell'intervallo aperto (0, 1).
+  - Cardinalità nodale: il range degli indici progressivi generati n appartiene sempre all'intervallo chiuso [0, N^2 - 1].
+
+- Dipendenze da altri moduli:
+  - Essendo il modulo di innesco dell'architettura, non presenta dipendenze a monte. I file di testo generati costituiscono la base dati per l'algoritmo di partizionamento (Task 2) e per i successivi script risolutivi.
+
+ 
+  --- AGGIORNAMENTO FASE 2: Specifica Task 2 (Nested Dissection) ---
+Obiettivo: Implementare il Task 2 in C++ per calcolare un nuovo ordinamento dei nodi tramite algoritmo di partizionamento ricorsivo per minimizzare il fill-in di Cholesky.
+Per quale motivo è importante il riordinamento nodale tramite Nested Dissection?
+
+1. La Matrice Sparsa e la Fattorizzazione
+Nel Task 1, la topologia della griglia genera un grafo in cui ogni nodo è connesso esclusivamente ai suoi vicini adiacenti. Questa struttura si traduce in una matrice delle adiacenze (utilizzata nel Task 4 per la risoluzione del sistema lineare) di tipo "sparso", ovvero popolata quasi interamente da zeri. Per risolvere il sistema, il progetto prevede l'uso della fattorizzazione di Cholesky, che scompone la matrice originale nel prodotto di due matrici triangolari.
+
+2. Il Fenomeno del "Fill-in"
+Durante il processo matematico di fattorizzazione, le operazioni algebriche tra righe e colonne causano frequentemente la trasformazione di elementi originariamente nulli (zeri) in valori numerici non nulli all'interno della nuova matrice triangolare. Questo fenomeno fisiologico prende il nome tecnico di "fill-in" (riempimento).
+
+3. Le Conseguenze dell'Ordinamento Naturale
+Se si mantenesse l'ordinamento "naturale" dei nodi calcolato nel Task 1 (da 1 a N^2), la proliferazione del fill-in risulterebbe incontrollata. Ciò comporterebbe due gravi criticità computazionali:
+- Saturazione della memoria: i nuovi elementi non nulli richiedono allocazione dinamica continua, portando a un consumo eccessivo e insostenibile di memoria RAM.
+- Decadimento delle prestazioni: l'aumento esponenziale dei valori non nulli incrementa drasticamente il numero di calcoli necessari per completare la risoluzione del sistema, allungando i tempi di esecuzione in modo inaccettabile.
+
+4. La Soluzione Implementata (Task 2)
+Il riordinamento dei nodi tramite Nested Dissection equivale a permutare in modo strategico le righe e le colonne della matrice originaria. Questo specifico partizionamento gerarchico costringe gli elementi non nulli ad assumere una rigorosa struttura a blocchi. Tale conformazione matematica "intrappola" le operazioni, minimizzando drasticamente la generazione di nuovo fill-in. L'algoritmo garantisce così un'impronta di memoria contenuta e un'elevata efficienza risolutiva, giustificando pienamente la complessità architetturale del Task 2.
+
+- Input: Il file "coords.txt" (generato precedentemente nel Task 1), contenente l'elenco dei nodi con i relativi ID originali e le coordinate x, y.
+- Output: Il file "ordering.txt", strutturato in due colonne: la prima rappresenta il nuovo indice progressivo calcolato m, la seconda indica l'ID originale del nodo ad esso associato.
+
+- Specifiche funzionali (Metodologia e Logica):
+  - Taglio Alternato: Il dominio spaziale viene diviso a metà in modo ricorsivo, alternando l'asse di taglio tra orizzontale (asse y) e verticale (asse x).
+  - Classificazione dei Nodi: Calcolato il punto medio lungo l'asse corrente, i nodi vengono ripartiti in tre sottoinsiemi: V1 (a sinistra/sotto), V2 (a destra/sopra) e VS (esattamente sul separatore).
+  - Gestione Precisione: Il confronto per l'appartenenza a VS avviene applicando una tolleranza numerica (es. 10^-6) per ovviare agli errori di approssimazione floating-point.
+  - Ricorsione e Assegnazione: L'algoritmo viene richiamato su V1 e V2 invertendo l'asse di taglio. I nodi in VS vengono accodati per ultimi, ricevendo gli indici maggiori in quella specifica fase.
+
+- Strutture dati utilizzate:
+  - Definizione di una struct "Nodo" per incapsulare l'ID originale e le coordinate spaziali (x, y).
+  - Utilizzo di std::vector per la gestione dinamica e sicura in memoria dei sottoinsiemi (V1, V2, VS) durante le fasi di partizionamento.
+
+- Complessità attesa degli algoritmi: 
+  - Il calcolo del punto medio e la suddivisione richiedono un tempo lineare rispetto al numero di nodi presenti nel sottoinsieme analizzato. Essendo il numero totale di nodi pari a V = N^2, l'albero di ricorsione ha una profondità logaritmica. La complessità temporale complessiva attesa è pertanto O(V log V), ovvero O(N^2 log N).
+
+- Eventuali invarianti mantenuti dalle strutture dati: 
+  - Conservazione della cardinalità: il numero totale di nodi si mantiene costante durante tutte le chiamate ricorsive (nessun nodo viene perso o duplicato).
+  - Integrità dell'identità: la corrispondenza biunivoca all'interno della struct tra l'ID originale del nodo e le sue coordinate spaziali (x, y) rimane immutata per tutta la durata dell'elaborazione.
+
+- Dipendenze da altri moduli:
+  - Il modulo dipende logicamente e operativamente dall'esecuzione del Task 1 (modulo C++), in quanto necessita della corretta generazione strutturale della griglia salvata nel file "coords.txt".
