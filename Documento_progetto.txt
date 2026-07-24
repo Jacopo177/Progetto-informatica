@@ -91,3 +91,30 @@ Il riordinamento dei nodi tramite Nested Dissection equivale a permutare in modo
 
 - Dipendenze da altri moduli:
   - Il modulo dipende logicamente e operativamente dall'esecuzione del Task 1 (modulo C++), in quanto necessita della corretta generazione strutturale della griglia salvata nel file "coords.txt".
+
+
+
+--- AGGIORNAMENTO FASE 3: Specifica Task 3 (Costruzione Matrice e Termine Noto) ---
+Obiettivo: Costruire un codice C++ che produce i file A.txt e rhs.txt che contengano tutte le entrate della matrice A e quelle del vettore dei termini noti del sistema lineare.
+
+- Input: I file di testo generati dalle fasi precedenti, in particolare il file "coords.txt" (per le coordinate e l'ordinamento naturale) e il file "ordering.txt" (per il nuovo ordinamento).
+- Output: 
+  1. File "A.txt": Ogni riga deve contenere gli indici i j A[i,j] rispetto al nuovo ordinamento.
+  2. File "rhs.txt": Ogni riga deve contenere solo il valore del termine noto che corrisponde alla stessa riga nel file per A.
+
+- Specifiche funzionali:
+  - Approssimazione numerica: Il sistema lineare è ottenuto imponendo, per tutti i punti interni del dominio, che valga la seguente approssimazione alle differenze finite: (kappa/h^2) * (u_{i-1,j} + u_{i+1,j} + u_{i,j-1} + u_{i,j+1} - 4u_{i,j}) + f(x_i, y_j) = 0.
+  - Scelta dell'ordinamento: Il codice deve poter considerare le incognite del sistema lineare ordinate come specificato dal file "ordering.txt", oppure con l'ordinamento "naturale" del file "coords.txt".
+  - Condizioni al bordo: I valori di u sui punti di bordo non sono incognite del sistema lineare: i loro eventuali contributi devono essere incorporati nel termine noto.
+  - Funzionalità Opzionale: Aggiungere al codice la possibilità di scegliere una funzione u_0(x,y) != 0; questo richiederà di cambiare il right hand side del sistema lineare in modo coerente.
+
+- Strutture dati utilizzate:
+  - std::vector (o mappe come std::unordered_map) per immagazzinare il dizionario di traduzione tra i vecchi ID nodali (ordinamento naturale) e i nuovi ID (nested dissection) caricati da ordering.txt.
+  - Scrittura diretta tramite std::ofstream per produrre l'output della matrice riga per riga nel formato a coordinate (COO), evitando di allocare in memoria matrici dense o eccessivamente pesanti.
+
+- Complessità attesa degli algoritmi:
+  - Complessità temporale: O(N^2). L'algoritmo deve scansionare iterativamente tutti i nodi interni della griglia per calcolare i coefficienti della "stella" a 5 punti (Nodo centrale + i 4 vicini) e inserirli nei file di testo.
+  - Complessità spaziale: O(N^2) in RAM. Il sistema necessita di caricare in memoria le coordinate dei nodi e le mappe di riordinamento, ma l'impronta rimane lineare rispetto al numero totale di nodi (V = N^2), poiché la matrice espansa viene scritta direttamente su disco, cioè non viene mai creata la matrice intera in RAM.
+
+- Dipendenze da altri moduli:
+  - Il modulo necessita imprescindibilmente che i Task 1 e Task 2 siano stati eseguiti correttamente, poiché dipende in modo diretto dalla struttura del grafo definita in coords.txt e dalle direttive di permutazione contenute in ordering.txt.
