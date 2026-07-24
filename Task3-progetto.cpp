@@ -33,7 +33,7 @@ int main() {
     std::cin >> scelta_ordine;
 
     // 2. Lettura dei nodi da coords.txt usando il percorso assoluto fornito
-    std::ifstream file_coords("C:\\Users\\jacop\\OneDrive\\Desktop\\Informatica\\progetto-informatica\\task1-progetto\\task1-progetto\\coords.txt.txt");
+    std::ifstream file_coords("coords.txt");
     if (!file_coords) {
         std::cerr << "Errore: file coords.txt non trovato nel percorso specificato!" << std::endl;
         return 1;
@@ -58,7 +58,7 @@ int main() {
     std::vector<int> old_to_new(num_nodi);
     if (scelta_ordine == 1) {
         // Lettura da ordering.txt usando il percorso assoluto fornito
-        std::ifstream file_ordering("C:\\Users\\jacop\\OneDrive\\Desktop\\Informatica\\progetto-informatica\\task1-progetto\\task1-progetto\\ordering.txt");
+        std::ifstream file_ordering("ordering.txt");
         if (!file_ordering) {
             std::cerr << "Errore: ordering.txt non trovato nel percorso specificato!" << std::endl;
             return 1;
