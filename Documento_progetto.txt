@@ -118,3 +118,35 @@ Obiettivo: Costruire un codice C++ che produce i file A.txt e rhs.txt che conten
 
 - Dipendenze da altri moduli:
   - Il modulo necessita imprescindibilmente che i Task 1 e Task 2 siano stati eseguiti correttamente, poiché dipende in modo diretto dalla struttura del grafo definita in coords.txt e dalle direttive di permutazione contenute in ordering.txt.
+
+
+ --- AGGIORNAMENTO FASE 4: Specifica Task 4 ---
+Obiettivo: Leggere i file A.txt e rhs.txt e salvare la matrice sparsa in formato CSC, calcolare la fattorizzazione di Cholesky A=LL^t con L triangolare inferiore, A matrice sparsa simmetrica definita positiva e risoluzione del sistema lineare.
+
+- Input:
+  - A.txt: file contenente i coefficienti della matrice sparsa in formato di coordinate (riga, colonna, valore).
+  - rhs.txt: file contenente il termine noto del sistema lineare.
+  - coords.txt: file contenente le coordinate spaziali dei nodi della griglia.
+  - ordering.txt: file contenente la mappatura esatta tra gli indici del nuovo ordinamento (Nested Dissection) e l'ordinamento naturale delle coordinate.
+
+- Output:
+  - Fattorizzazione di Cholesky (L) e risoluzione del sistema lineare per ottenere il vettore delle temperature.
+   - Grafico della struttura di sparsità (A e L) e Heatmap termica bidimensionale della diffusione con la sorgente gaussiana posizionata correttamente all'origine.
+
+- Specifiche funzionali:
+  - Caricamento dei dati tramite NumPy e gestione della matrice sparsa in formato CSC tramite SciPy.
+  - Mappatura degli indici tramite ordering.txt per ripristinare la coerenza spaziale tra i dati risolti in Nested Dissection e le coordinate geometriche naturali.
+  - Calcolo della fattorizzazione di Cholesky supernodale utilizzando la libreria scikit-sparse (cho_factor con opzione order="natural" per preservare il fill-in ottimizzato dal Nested Dissection).
+
+- Strutture dati utilizzate:
+  - Array NumPy 1D e 2D (np.ndarray) per la gestione di coordinate, termini noti, vettori di permutazione e soluzioni.
+  - Matrice sparsa in formato CSC (scipy.sparse.csc_matrix) per ottimizzare l'occupazione di memoria e i tempi di calcolo.
+  - Oggetto CholeskyFactor restituito da scikit-sparse per la fattorizzazione e risoluzione efficiente del sistema.
+
+- Complessità attesa degli algoritmi:
+  - Complessità di risoluzione e fattorizzazione fortemente ridotta rispetto all'ordinamento standard grazie all'efficacia del Nested Dissection sul fill-in della matrice L.
+
+- Dipendenze da altri moduli:
+  - Moduli Python: numpy, scipy.sparse, matplotlib.pyplot, scikit-sparse (sksparse.cholmod).
+  - File di dati generati dai task precedenti (A.txt, rhs.txt, coords.txt, ordering.txt).
+  
