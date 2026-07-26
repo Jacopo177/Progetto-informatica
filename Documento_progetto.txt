@@ -121,32 +121,64 @@ Obiettivo: Costruire un codice C++ che produce i file A.txt e rhs.txt che conten
 
 
  --- AGGIORNAMENTO FASE 4: Specifica Task 4 ---
-Obiettivo: Leggere i file A.txt e rhs.txt e salvare la matrice sparsa in formato CSC, calcolare la fattorizzazione di Cholesky A=LL^t con L triangolare inferiore, A matrice sparsa simmetrica definita positiva e risoluzione del sistema lineare.
+Obiettivo: Leggere i file A.txt e rhs.txt e salvare la matrice sparsa in formato CSC, calcolare la fattorizzazione di Cholesky A=LL^t con L triangolare inferiore, A matrice sparsa simmetrica definita positiva e risoluzione del sistema lineare per ottenere il campo di temperatura.
 
-- Input:
-  - A.txt: file contenente i coefficienti della matrice sparsa in formato di coordinate (riga, colonna, valore).
-  - rhs.txt: file contenente il termine noto del sistema lineare.
-  - coords.txt: file contenente le coordinate spaziali dei nodi della griglia.
-  - ordering.txt: file contenente la mappatura esatta tra gli indici del nuovo ordinamento (Nested Dissection) e l'ordinamento naturale delle coordinate.
+ 
+1. Input
+- A.txt: file contenente i coefficienti della matrice sparsa in formato coordinate (riga, colonna, valore).
+- rhs.txt: file contenente il termine noto del sistema lineare.
+- coords.txt: file contenente le coordinate spaziali dei nodi della griglia.
+- ordering.txt: file opzionale/dinamico contenente la mappatura esatta tra gli indici del nuovo ordinamento (Nested Dissection) e l'ordinamento naturale delle coordinate.
 
-- Output:
-  - Fattorizzazione di Cholesky (L) e risoluzione del sistema lineare per ottenere il vettore delle temperature.
-   - Grafico della struttura di sparsità (A e L) e Heatmap termica bidimensionale della diffusione con la sorgente gaussiana posizionata correttamente all'origine.
+2. Output
+- Fattorizzazione di Cholesky calcolata preservando la struttura ottimizzata.
+- Vettore soluzione u (temperature nei nodi della griglia).
+- sparsity.png: Grafico comparativo (spy) della struttura di sparsità della matrice A originale e del fattore L per valutare visivamente il fill-in.
+- heatmap.png: Mappa di calore (Heatmap) bidimensionale della diffusione termica, con riposizionamento corretto della sorgente grazie alla ricostruzione delle coordinate.
 
-- Specifiche funzionali:
-  - Caricamento dei dati tramite NumPy e gestione della matrice sparsa in formato CSC tramite SciPy.
-  - Mappatura degli indici tramite ordering.txt per ripristinare la coerenza spaziale tra i dati risolti in Nested Dissection e le coordinate geometriche naturali.
-  - Calcolo della fattorizzazione di Cholesky supernodale utilizzando la libreria scikit-sparse (cho_factor con opzione order="natural" per preservare il fill-in ottimizzato dal Nested Dissection).
+3. Specifiche Funzionali e Strutture Dati
+- Gestione Dati: I dati vengono caricati tramite numpy.loadtxt e inseriti in array vettorializzati.
+- Costruzione Matrice: Generazione della matrice in formato scipy.sparse.csc_matrix, essenziale per l'efficienza degli algoritmi di fattorizzazione successivi.
+- Mappatura Spaziale (Nested Dissection): Implementazione di due strategie di ricostruzione topologica (tramite file ordering.txt se disponibile, altrimenti tramite un matching euristico basato sulla funzione sorgente f(x,y)) per ripristinare la coerenza spaziale tra i gradi di libertà riordinati e il piano geometrico reale.
+- Risolutore e Aggiornamento API: Rispetto alle indicazioni storiche basate su spsolve_triangular, si sfrutta l'API moderna della libreria sksparse.cholmod. Viene generato un oggetto CholeskyFactor tramite cho_factor(A_csc, order="natural"). L'opzione order="natural" impone a CHOLMOD di non applicare ulteriori euristiche interne (come AMD), permettendo di preservare e misurare esattamente l'effetto del Nested Dissection implementato nei task precedenti. La risoluzione finale è demandata al metodo ottimizzato .solve(rhs).
 
-- Strutture dati utilizzate:
-  - Array NumPy 1D e 2D (np.ndarray) per la gestione di coordinate, termini noti, vettori di permutazione e soluzioni.
-  - Matrice sparsa in formato CSC (scipy.sparse.csc_matrix) per ottimizzare l'occupazione di memoria e i tempi di calcolo.
-  - Oggetto CholeskyFactor restituito da scikit-sparse per la fattorizzazione e risoluzione efficiente del sistema.
+4. Complessità Attesa
+Si prevede una marcata riduzione dello spazio di memoria richiesto (fill-in minimizzato in L) e del tempo di esecuzione rispetto a una fattorizzazione standard, a riprova dell'efficacia dell'algoritmo di riordinamento a bisezione.
 
-- Complessità attesa degli algoritmi:
-  - Complessità di risoluzione e fattorizzazione fortemente ridotta rispetto all'ordinamento standard grazie all'efficacia del Nested Dissection sul fill-in della matrice L.
+5. Dipendenze Software
+- numpy (array e I/O).
+- scipy.sparse (strutture dati CSC).
+- matplotlib.pyplot (funzioni spy e scatter per rendering grafico).
+- scikit-sparse (motore di calcolo cholmod).
 
-- Dipendenze da altri moduli:
-  - Moduli Python: numpy, scipy.sparse, matplotlib.pyplot, scikit-sparse (sksparse.cholmod).
-  - File di dati generati dai task precedenti (A.txt, rhs.txt, coords.txt, ordering.txt).
-  
+---  AGGIORNAMENTO FASE 5 : Specifica task 5 ---
+- Obiettivo
+Eseguire un benchmark prestazionale per confrontare l'efficienza della fattorizzazione di Cholesky applicata a matrici sparse utilizzando l'Ordinamento Naturale contro il riordinamento Nested Dissection, variando la dimensione della griglia spaziale (da N=32 a N=1024).
+
+1. Input
+- Set di dati generati dal codice C++ per diverse dimensioni della griglia (es. N = 32, 64, 128, 256, 512, 1024).
+- File contenenti i coefficienti della matrice per ciascun N sia in Ordinamento Naturale sia in Nested Dissection.
+
+2. Output
+- Dati quantitativi sui tempi di CPU impiegati per la fattorizzazione di ciascuna matrice.
+- Dati quantitativi sul consumo di memoria, misurato tramite il calcolo del fill-in (numero di elementi non nulli, nnz, nel fattore L).
+- Grafici comparativi finali su scala logaritmica (Tempo vs N, Memoria vs N) per evidenziare il divario prestazionale tra i due algoritmi.
+
+3. Specifiche Funzionali e Strutture Dati
+- Gestione Iterativa: Ciclo for per automatizzare il caricamento e l'analisi di tutti i file generati per i diversi N.
+- Costruzione Matrici: Caricamento efficiente tramite numpy.loadtxt e conversione in scipy.sparse.csc_matrix.
+- Misurazioni: Utilizzo del modulo standard time (o timer equivalenti) per registrare i secondi impiegati dal risolutore. Estrazione dell'attributo .nnz dall'oggetto matrice per misurare l'impronta di memoria spaziale.
+- Risolutore: Utilizzo costante di sksparse.cholmod tramite cho_factor(order="natural") per garantire che i test riflettano fedelmente la topologia dei dati in ingresso senza interferenze interne della libreria.
+- Memorizzazione e Rendering: Salvataggio dei risultati in array o liste Python e successiva visualizzazione grafica tramite matplotlib.pyplot.
+
+4. Complessità Attesa
+Si attende un comportamento fortemente divergente tra i due approcci all'aumentare di N:
+- Ordinamento Naturale: crescita drastica del fill-in e dei tempi di esecuzione, con potenziale saturazione della memoria RAM (Out of Memory) per griglie estese (N=1024).
+- Nested Dissection: contenimento efficace del fill-in e tempi di calcolo di ordini di grandezza inferiori, dimostrando una complessità scalabile e trattabile computazionalmente.
+
+5. Dipendenze Software
+- numpy (array e I/O).
+- scipy.sparse (strutture dati CSC).
+- matplotlib.pyplot (per la generazione dei grafici di benchmark).
+- scikit-sparse (motore di calcolo cholmod).
+- time (modulo standard Python per il tracciamento delle prestazioni).
