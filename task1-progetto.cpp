@@ -26,15 +26,15 @@ int main() {
     double h = 1.0 / (N + 1);
 
     // Creazione e apertura dei file di testo in scrittura
-    ofstream file_coords("coords1.txt");
-    ofstream file_conn("connectivity1.txt");
+    ofstream file_coords("coords.txt");
+    ofstream file_conn("connectivity.txt");
 
     if (!file_coords.is_open() || !file_conn.is_open()) {
         cerr << "Errore: impossibile creare i file di output." << endl;
         return 1;
     }
 
-    // --- 1. GENERAZIONE DEL FILE coords.txt ---
+    // GENERAZIONE DEL FILE coords.txt 
     // I nodi interni (blu) vanno da 1 a N sia per le x che per le y
     for (int j = 1; j <= N; ++j) {
         for (int i = 1; i <= N; ++i) {
@@ -47,7 +47,7 @@ int main() {
         }
     }
 
-    // --- 2. GENERAZIONE DEL FILE connectivity.txt ---
+    // GENERAZIONE DEL FILE connectivity.txt
     int e = 0; // Indice progressivo degli archi (parte da 0 come richiesto)
 
     for (int j = 1; j <= N; ++j) {
@@ -56,7 +56,6 @@ int main() {
 
             // Per evitare archi duplicati in un grafo non orientato,
             // colleghiamo il nodo corrente SOLO con quello alla sua DESTRA e in ALTO.
-
             // Connessione con il nodo a destra (stessa riga j, colonna successiva i+1)
             if (i < N) {
                 int n2 = calcola_n(i + 1, j, N);
@@ -75,11 +74,11 @@ int main() {
         }
     }
 
-    // Chiusura dei file (fondamentale per salvare i dati sul disco)
+    // Chiusura dei file
     file_coords.close();
     file_conn.close();
 
-    cout << "Task 1 completato! File 'coords.txt' e 'connectivity.txt' generati." << endl;
+    cout << "File 'coords.txt' e 'connectivity.txt' generati." << endl;
     return 0;
 }
  
