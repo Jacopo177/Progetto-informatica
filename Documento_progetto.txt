@@ -111,11 +111,11 @@ Obiettivo: Costruire un codice C++ che produce i file A.txt e rhs.txt che conten
   - Funzionalità Opzionale: Aggiungere al codice la possibilità di scegliere una funzione u_0(x,y) != 0; questo richiederà di cambiare il right hand side del sistema lineare in modo coerente.
 
 - Strutture dati utilizzate:
-  - std::vector (o mappe come std::unordered_map) per immagazzinare il dizionario di traduzione tra i vecchi ID nodali (ordinamento naturale) e i nuovi ID (nested dissection) caricati da ordering.txt.
+  - std::vector per immagazzinare il dizionario di traduzione tra i vecchi ID nodali (ordinamento naturale) e i nuovi ID (nested dissection) caricati da ordering.txt.
   - Scrittura diretta tramite std::ofstream per produrre l'output della matrice riga per riga nel formato a coordinate (COO), evitando di allocare in memoria matrici dense o eccessivamente pesanti.
 
 - Complessità attesa degli algoritmi:
-  - Complessità temporale: O(N^2). L'algoritmo deve scansionare iterativamente tutti i nodi interni della griglia per calcolare i coefficienti della "stella" a 5 punti (Nodo centrale + i 4 vicini) e inserirli nei file di testo.
+  - Complessità temporale: O(N^2). L'algoritmo deve scansionare iterativamente tutti i nodi interni della griglia per calcolare i coefficienti (Nodo centrale + i 4 vicini) e inserirli nei file di testo.
   - Complessità spaziale: O(N^2) in RAM. Il sistema necessita di caricare in memoria le coordinate dei nodi e le mappe di riordinamento, ma l'impronta rimane lineare rispetto al numero totale di nodi (V = N^2), poiché la matrice espansa viene scritta direttamente su disco, cioè non viene mai creata la matrice intera in RAM.
 
 - Dipendenze da altri moduli:
