@@ -64,7 +64,7 @@ int main() {
     std::vector<Nodo> tutti_i_nodi;
     std::ifstream file_in("coords.txt");
     if (!file_in) {
-        std::cerr << "Errore: impossibile aprire coords.txt. Assicurati che sia nella stessa cartella!" << std::endl;
+        std::cerr << "File non trovato." << std::endl;
         return 1;
     }
 
@@ -87,6 +87,6 @@ int main() {
     }
     file_out.close();
 
-    std::cout << "Task 2 completato! File 'ordering.txt' generato con successo." << std::endl;
+    std::cout << "File ordering.txt generato." << std::endl;
     return 0;
 }

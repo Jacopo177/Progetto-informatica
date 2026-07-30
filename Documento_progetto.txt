@@ -85,7 +85,7 @@ Il riordinamento dei nodi tramite Nested Dissection equivale a permutare in modo
   - Utilizzo di std::vector per la gestione dinamica e sicura in memoria dei sottoinsiemi (V1, V2, VS) durante le fasi di partizionamento.
 
 - Complessità attesa degli algoritmi: 
-  - Il calcolo del punto medio e la suddivisione richiedono un tempo lineare rispetto al numero di nodi presenti nel sottoinsieme analizzato. Essendo il numero totale di nodi pari a V = N^2, l'albero di ricorsione ha una profondità logaritmica. La complessità temporale complessiva attesa è pertanto O(V log V), ovvero O(N^2 log N).
+  - Il partizionamento ricorsivo genera un albero di profondità logaritmica O(log V), dove V = N^2 è il numero totale dei nodi. Ad ogni livello della ricorsione, l'algoritmo riordina i sottoinsiemi utilizzando std::sort (che ha un costo intrinseco di O(V*log V)) per individuare con precisione la mediana spaziale. Di conseguenza, la complessità temporale complessiva dell'implementazione è limitata a O(V*log^2 V). Questa leggera maggiorazione rispetto al partizionamento lineare puro è ampiamente giustificata dall'assoluta robustezza geometrica garantita dall'ordinamento preventivo dei nodi.
 
 - Eventuali invarianti mantenuti dalle strutture dati: 
   - Conservazione della cardinalità: il numero totale di nodi si mantiene costante durante tutte le chiamate ricorsive (nessun nodo viene perso o duplicato).
